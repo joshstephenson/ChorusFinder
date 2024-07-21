@@ -3,24 +3,28 @@
 import numpy as np
 
 MIN_LENGTH = 2
-file = open("poem.txt", "r")
-text = file.read()
-file.close()
-
-text = list(text)
-count = len(text)
-m = np.zeros((count, count))
-
-# Calculate the co-occurrence matrix on the text against itself
-# e.g. the columns represent the chars in the text and the rows
-# represent the chars in the text
-for i in range(count):
-    for j in range(count):
-        if text[i].lower() == text[j].lower():
-            m[i][j] = 1
 
 
-def get_indices(length, row = 0, col = 1):
+def get_cooccurence(text, count):
+    """
+    Get co-occurence matrix from text against itself
+    e.g. the columns represent the chars in the text and the rows
+    represent the chars in the text
+    :param text: text to be co-occurences
+    :param count: number of chars in text
+    :return: 2x2 matrix of co-occurences
+    """
+    m = np.zeros((count, count))
+
+    for i in range(count):
+        for j in range(count):
+            if text[i].lower() == text[j].lower():
+                m[i][j] = 1
+
+    return m
+
+
+def get_indices(length, row=0, col=1):
     """
     :param length: length of text (eg - number of rows)
     :param row: row at which to start calculating diagonal indices
@@ -35,14 +39,16 @@ def get_indices(length, row = 0, col = 1):
     return indices
 
 
-def get_diag(m, row = 0, col = 1):
+def get_diag(text, m, row=0, col=1):
     """
-    :param m: co-occurrence matrix
+    :param text: original text string
+    :param m: co-occurrence matrix of text
     :param row: row at which to start
     :param col: col at which to start
     :return: substrings found by sequences of 1s on a diagonal
     """
     assert col > row
+    count = m.shape[0]
     indices = get_indices(count, row, col)
     substrings = []
     curr = ''
@@ -53,7 +59,7 @@ def get_diag(m, row = 0, col = 1):
             curr += char
 
         # if we are either at the end of the row or the end of a substring
-        if len(curr) != 0 and (m[ind[0]][ind[1]] != 1 or ind[1] == count-1):
+        if len(curr) != 0 and (m[ind[0]][ind[1]] != 1 or ind[1] == count - 1):
             if len(curr) >= MIN_LENGTH:
                 substrings.append(curr)
             curr = ''
@@ -61,14 +67,22 @@ def get_diag(m, row = 0, col = 1):
 
 
 def main():
+    file = open("poem.txt", "r")
+    text = file.read()
+    file.close()
+
+    text = list(text)
+    count = len(text)
+    m = get_cooccurence(text, count)
+
     longest = ''
     for i in range(1, count):
-        s = get_diag(m, 0, i)
-        for sub in s:
+        diag = get_diag(text, m, 0, i)
+        for sub in diag:
             if len(sub) > len(longest):
                 longest = sub
     print(longest)
 
+
 if __name__ == '__main__':
     main()
-
