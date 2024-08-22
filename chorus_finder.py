@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
 import numpy as np
+import argparse
 
-MIN_LENGTH = 2
+MIN_LENGTH = 20
 
 
 def get_cooccurence(text, count):
@@ -66,8 +67,8 @@ def get_diag(text, m, row=0, col=1):
     return substrings
 
 
-def main():
-    file = open("poem.txt", "r")
+def main(args):
+    file = open(args.file, "r")
     text = file.read()
     file.close()
 
@@ -85,4 +86,7 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-f", "--file", help="file path for poem as text file")
+    opts = parser.parse_args()
+    main(opts)
